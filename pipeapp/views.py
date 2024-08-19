@@ -37,7 +37,7 @@ class UserRegisterView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save()
-
+@csrf_exempt
 class UserLoginView(APIView):
     @swagger_auto_schema(request_body=LoginSerializer)
     def post(self, request, *args, **kwargs):
