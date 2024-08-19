@@ -6,8 +6,12 @@ from rest_framework.views import APIView
 from django.contrib.auth import authenticate, login as django_login
 from drf_yasg.utils import swagger_auto_schema
 
-from .serializers import UserSerializer, LoginSerializer, PipelineRouteSerializer, PipelineFaultSerializer
-from .models import PipelineRoute, PipelineFault
+from .serializers import UserSerializer, LoginSerializer
+from .models import PipelineRoute
+
+from rest_framework import viewsets
+from .models import PipelineRoute
+from .serializers import PipelineRouteAndFaultSerializer
 
 User = get_user_model()
 
