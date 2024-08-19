@@ -94,6 +94,43 @@ class UserSerializer(serializers.ModelSerializer):
 
         return user
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            profile = Profile.objects.get(user=request.user)
+            if profile.role == Profile.NATIONAL:
+                # National can see all fields
+                return representation
+            elif profile.role == Profile.ZONAL:
+                # Zone users see zone, state, area, and unit
+                return self._filter_profile_fields(representation, include=['zone', 'state', 'area', 'unit'])
+            elif profile.role == Profile.STATE:
+                # State users see state, area, and unit
+                return self._filter_profile_fields(representation, include=['state', 'area', 'unit'])
+            elif profile.role == Profile.AREA:
+                # Area users see area and unit
+                return self._filter_profile_fields(representation, include=['area', 'unit'])
+            elif profile.role == Profile.UNIT:
+                # Unit users see only the unit
+                return self._filter_profile_fields(representation, include=['unit'])
+        return representation
+
+    def _filter_profile_fields(self, representation, include=None):
+        """
+        Helper method to filter fields based on the included list.
+        """
+        if include is None:
+            include = []
+
+        profile_data = representation.get('profile', {})
+        # Create a new dictionary with only the fields in `include`
+        filtered_profile_data = {key: profile_data.get(key) for key in include}
+        representation['profile'] = filtered_profile_data
+
+        return representation
+
+
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     password = serializers.CharField(required=True, write_only=True)
@@ -108,82 +145,49 @@ class PipelineFaultSerializer(serializers.ModelSerializer):
         model = PipelineFault
         fields = ['fault_coordinates', 'description', 'reported_at', 'status']
 
-# Serializer for PipelineRoute, including faults and computed status
 class PipelineRouteAndFaultSerializer(serializers.ModelSerializer):
     state = serializers.CharField()  # Accept state as a char field (name)
     id = serializers.ReadOnlyField()
-    name = serializers.CharField()  # Allow name to be provided and updated
-    coordinates = serializers.JSONField()  # Include coordinates as a JSON field
-    status = serializers.SerializerMethodField()  # Use a method field to get the overall status
-    faults = PipelineFaultSerializer(many=True)  # Allow creating faults with the route
+    name = serializers.CharField()
+    coordinates = serializers.JSONField()
+    status = serializers.SerializerMethodField()
+    faults = PipelineFaultSerializer(many=True)
 
     class Meta:
         model = PipelineRoute
-        fields = [
-            'id', 'name', 'state', 'coordinates', 
-            'status', 'faults'
-        ]
+        fields = ['id', 'name', 'state', 'coordinates', 'status', 'faults']
         read_only_fields = ['id']
 
     def get_status(self, obj):
-        # Determine the overall status based on related faults
         if obj.faults.filter(status='critical').exists():
             return 'critical'
         elif obj.faults.filter(status='warning').exists():
             return 'warning'
         return 'normal'
 
-    def create(self, validated_data):
-        # Extract faults data from validated data
-        faults_data = validated_data.pop('faults', [])
-        
-        # Handle state
-        state_name = validated_data.pop('state')
-        state, _ = State.objects.get_or_create(name=state_name)
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            profile = Profile.objects.get(user=request.user)
+            if profile.role == Profile.NATIONAL:
+                # National sees all fields
+                return representation
+            elif profile.role == Profile.ZONAL:
+                # Zone users see only zone-related data
+                if instance.state.zone != profile.zone:
+                    return {}
+            elif profile.role == Profile.STATE:
+                # State users see only state-related data
+                if instance.state != profile.state:
+                    return {}
+            elif profile.role == Profile.AREA:
+                # Area users see only area-related data
+                if instance.state.area != profile.area:
+                    return {}
+            elif profile.role == Profile.UNIT:
+                # Unit users see only unit-related data
+                if instance.state.area.unit != profile.unit:
+                    return {}
+        return representation
 
-        # Check if the pipeline route with the same name already exists
-        pipeline_route, created = PipelineRoute.objects.update_or_create(
-            name=validated_data.get('name'),
-            defaults={
-                'state': state,
-                'coordinates': validated_data.get('coordinates')
-            }
-        )
-
-        # If updating, clear existing faults
-        if not created:
-            pipeline_route.faults.all().delete()
-
-        # Create new faults
-        for fault_data in faults_data:
-            PipelineFault.objects.create(pipeline_route=pipeline_route, **fault_data)
-
-        return pipeline_route
-
-    def update(self, instance, validated_data):
-        # Handle state
-        state_name = validated_data.pop('state', None)
-        if state_name:
-            try:
-                state = State.objects.get(name=state_name)
-            except State.DoesNotExist:
-                raise serializers.ValidationError({'state': f"State '{state_name}' does not exist."})
-            instance.state = state
-        
-        # Update pipeline route attributes
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        
-        instance.save()
-        
-        # Update or create related faults
-        faults_data = validated_data.pop('faults', None)
-        if faults_data is not None:
-            # First, clear existing faults
-            instance.faults.all().delete()
-            
-            # Then, create new faults
-            for fault_data in faults_data:
-                PipelineFault.objects.create(pipeline_route=instance, **fault_data)
-
-        return instance
