@@ -7,6 +7,7 @@ from drf_yasg.utils import swagger_auto_schema
 
 from .serializers import UserSerializer, LoginSerializer, PipelineRouteAndFaultSerializer
 from .models import PipelineRoute, Profile
+from django.contrib.auth.models import AnonymousUser
 
 User = get_user_model()
 
@@ -15,6 +16,8 @@ class IsHigherRole(permissions.BasePermission):
     Custom permission to only allow users with a higher or equal role to create users.
     """
     def has_permission(self, request, view):
+        if isinstance(request.user, AnonymousUser):
+            return True
         if request.method == 'POST':
             profile = Profile.objects.get(user=request.user)
             role = profile.role
