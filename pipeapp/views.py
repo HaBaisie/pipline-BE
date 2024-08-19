@@ -10,7 +10,7 @@ from .serializers import UserSerializer, LoginSerializer
 from .models import PipelineRoute
 
 from rest_framework import viewsets
-from .models import PipelineRoute
+
 from .serializers import PipelineRouteAndFaultSerializer
 
 User = get_user_model()
