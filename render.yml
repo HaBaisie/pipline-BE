@@ -1,1 +1,22 @@
-buildCommand: "python manage.py collectstatic --noinput"
+services:
+  - type: web
+    name: your-service-name
+    env: python
+    buildCommand: "pip install -r requirements.txt && python3 manage.py collectstatic --noinput"
+    startCommand: "gunicorn pipeline.wsgi:application"
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: pipeline.settings
+      - key: SECRET_KEY
+        value: your-secret-key
+      - key: DEBUG
+        value: false
+      # Other environment variables
+
+    # Optionally specify a health check path
+    healthCheckPath: "/"
+
+    # Ensure you are using Python 3.9 or your preferred version
+    pythonVersion: 3.9
+
+buildCommand: "python3 manage.py collectstatic --noinput"
