@@ -1,52 +1,34 @@
 from django.shortcuts import render
-from rest_framework import generics, status, permissions, viewsets
-from django.contrib.auth import get_user_model, authenticate, login as django_login
+from rest_framework import generics, status
+from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.contrib.auth import authenticate, login as django_login
 from drf_yasg.utils import swagger_auto_schema
 
-from .serializers import UserSerializer, LoginSerializer, PipelineRouteAndFaultSerializer
-from .models import PipelineRoute, Profile
-from django.contrib.auth.models import AnonymousUser
+from .serializers import UserSerializer, LoginSerializer
+from .models import PipelineRoute
+
+from rest_framework import viewsets
+
+from .serializers import PipelineRouteAndFaultSerializer
 
 User = get_user_model()
-class IsHigherRole(permissions.BasePermission):
-    """
-    Custom permission to only allow users with a higher or equal role to create users.
-    """
-    def has_permission(self, request, view):
-        # Allow anonymous users to create new users
-        if isinstance(request.user, AnonymousUser):
-            return True
-        
-        if request.method == 'POST':
-            try:
-                profile = Profile.objects.get(user=request.user)
-                role = profile.role
-            except Profile.DoesNotExist:
-                return False
 
-            if role == Profile.NATIONAL:
-                return True
-            elif role == Profile.ZONAL:
-                return 'role' in request.data and request.data['role'] in [Profile.STATE]
-            elif role == Profile.STATE:
-                return 'role' in request.data and request.data['role'] in [Profile.AREA]
-            elif role == Profile.AREA:
-                return 'role' in request.data and request.data['role'] in [Profile.UNIT]
-            return False
-        return True
-
+# User registration view
 class UserRegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsHigherRole]  # No need to enforce IsAuthenticated
+    
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def perform_create(self, serializer):
-        # Allow creation regardless of whether the user is anonymous
-        serializer.save()
-
-
+# User login view
 class UserLoginView(APIView):
     @swagger_auto_schema(request_body=LoginSerializer)
     def post(self, request, *args, **kwargs):
@@ -63,24 +45,13 @@ class UserLoginView(APIView):
             return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+
+
+from rest_framework import viewsets
+from .models import PipelineRoute
+from .serializers import PipelineRouteAndFaultSerializer
+
 class PipelineRouteAndFaultViewSet(viewsets.ModelViewSet):
+    queryset = PipelineRoute.objects.all()
     serializer_class = PipelineRouteAndFaultSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        user = self.request.user
-        profile = Profile.objects.get(user=user)
-        queryset = PipelineRoute.objects.all()
-
-        if profile.role == Profile.NATIONAL:
-            return queryset
-        elif profile.role == Profile.ZONAL:
-            return queryset.filter(state__zone=profile.zone)
-        elif profile.role == Profile.STATE:
-            return queryset.filter(state=profile.state)
-        elif profile.role == Profile.AREA:
-            return queryset.filter(state__area=profile.area)
-        elif profile.role == Profile.UNIT:
-            return queryset.filter(state__area__unit=profile.unit)
-        
-        return queryset.none()  # Fallback to no data if no role matches
