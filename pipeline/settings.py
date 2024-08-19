@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'pipeapp',
     'drf_yasg',
+    'corsheaders',
     
 ]
 REST_FRAMEWORK = {
@@ -63,7 +64,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'pipeline.urls'
 
