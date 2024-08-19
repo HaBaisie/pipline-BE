@@ -3,10 +3,6 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     UserRegisterView, 
     UserLoginView, 
-    PipelineRouteListCreateView, 
-    PipelineRouteDetailView, 
-    PipelineFaultListCreateView, 
-    PipelineFaultDetailView, 
     PipelineRouteAndFaultViewSet
 )
 

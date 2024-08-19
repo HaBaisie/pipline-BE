@@ -6,10 +6,8 @@ from rest_framework.views import APIView
 from django.contrib.auth import authenticate, login as django_login
 from drf_yasg.utils import swagger_auto_schema
 
-from .serializers import UserSerializer, LoginSerializer
-from rest_framework import viewsets
-from .models import PipelineRoute
-from .serializers import PipelineRouteAndFaultSerializer
+from .serializers import UserSerializer, LoginSerializer, PipelineRouteSerializer, PipelineFaultSerializer
+from .models import PipelineRoute, PipelineFault
 
 User = get_user_model()
 
@@ -43,6 +41,12 @@ class UserLoginView(APIView):
             return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+
+
+from rest_framework import viewsets
+from .models import PipelineRoute
+from .serializers import PipelineRouteAndFaultSerializer
 
 class PipelineRouteAndFaultViewSet(viewsets.ModelViewSet):
     queryset = PipelineRoute.objects.all()
