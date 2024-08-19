@@ -58,16 +58,26 @@ REST_FRAMEWORK = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
+# Allow all origins
 CORS_ALLOW_ALL_ORIGINS = True
+
+# Allow all headers
+CORS_ALLOW_HEADERS = ['*']
+
+# Allow all methods (if needed)
+CORS_ALLOW_METHODS = ['*']
+
+# Allow credentials (cookies, HTTP authentication)
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'pipeline.urls'
 
