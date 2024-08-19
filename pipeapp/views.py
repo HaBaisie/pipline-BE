@@ -6,8 +6,10 @@ from rest_framework.views import APIView
 from django.contrib.auth import authenticate, login as django_login
 from drf_yasg.utils import swagger_auto_schema
 
-from .serializers import UserSerializer, LoginSerializer, PipelineRouteSerializer, PipelineFaultSerializer
-from .models import PipelineRoute, PipelineFault
+from .serializers import UserSerializer, LoginSerializer
+from rest_framework import viewsets
+from .models import PipelineRoute
+from .serializers import PipelineRouteAndFaultSerializer
 
 User = get_user_model()
 
@@ -41,48 +43,6 @@ class UserLoginView(APIView):
             return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# PipelineRoute views
-class PipelineRouteListCreateView(generics.ListCreateAPIView):
-    queryset = PipelineRoute.objects.all()
-    serializer_class = PipelineRouteSerializer
-
-    def create(self, request, *args, **kwargs):
-        if isinstance(request.data, list):
-            serializer = self.get_serializer(data=request.data, many=True)
-        else:
-            serializer = self.get_serializer(data=request.data)
-
-        if serializer.is_valid():
-            self.perform_create(serializer)
-            headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-class PipelineRouteDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = PipelineRoute.objects.all()
-    serializer_class = PipelineRouteSerializer
-
-# PipelineFault views
-class PipelineFaultListCreateView(generics.ListCreateAPIView):
-    queryset = PipelineFault.objects.all()
-    serializer_class = PipelineFaultSerializer
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            self.perform_create(serializer)
-            headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class PipelineFaultDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = PipelineFault.objects.all()
-    serializer_class = PipelineFaultSerializer
-
-
-from rest_framework import viewsets
-from .models import PipelineRoute
-from .serializers import PipelineRouteAndFaultSerializer
 
 class PipelineRouteAndFaultViewSet(viewsets.ModelViewSet):
     queryset = PipelineRoute.objects.all()
