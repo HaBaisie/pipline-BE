@@ -10,20 +10,24 @@ from .models import PipelineRoute, Profile
 from django.contrib.auth.models import AnonymousUser
 
 User = get_user_model()
-
 class IsHigherRole(permissions.BasePermission):
     """
     Custom permission to only allow users with a higher or equal role to create users.
     """
     def has_permission(self, request, view):
+        # Allow anonymous users to create new users
         if isinstance(request.user, AnonymousUser):
             return True
+        
         if request.method == 'POST':
-            profile = Profile.objects.get(user=request.user)
-            role = profile.role
+            try:
+                profile = Profile.objects.get(user=request.user)
+                role = profile.role
+            except Profile.DoesNotExist:
+                return False
 
             if role == Profile.NATIONAL:
-                return True  # National can create users at any level
+                return True
             elif role == Profile.ZONAL:
                 return 'role' in request.data and request.data['role'] in [Profile.STATE]
             elif role == Profile.STATE:
@@ -36,10 +40,12 @@ class IsHigherRole(permissions.BasePermission):
 class UserRegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsHigherRole]  # Ensure user is logged in and has permission
+    permission_classes = [IsHigherRole]  # No need to enforce IsAuthenticated
 
     def perform_create(self, serializer):
+        # Allow creation regardless of whether the user is anonymous
         serializer.save()
+
 
 class UserLoginView(APIView):
     @swagger_auto_schema(request_body=LoginSerializer)
