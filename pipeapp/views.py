@@ -33,7 +33,7 @@ class IsHigherRole(permissions.BasePermission):
 class UserRegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated, IsHigherRole]  # Ensure user is logged in and has permission
+    permission_classes = [IsHigherRole]  # Ensure user is logged in and has permission
 
     def perform_create(self, serializer):
         serializer.save()
