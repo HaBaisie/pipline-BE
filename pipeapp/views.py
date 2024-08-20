@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model, authenticate, login as django_lo
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema
-
+from django.contrib.auth import logout as django_logout
 from .serializers import UserSerializer, LoginSerializer, PipelineRouteAndFaultSerializer
 from .models import PipelineRoute, Profile
 
@@ -87,3 +87,12 @@ class PipelineRouteAndFaultViewSet(viewsets.ModelViewSet):
             return queryset.filter(state__area__unit=profile.unit)
         
         return queryset.none()  # Fallback to no data if no role matches
+
+
+class UserLogoutView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        django_logout(request)
+        return Response({"message": "Logout successful"}, status=status.HTTP_200_OK)
+
