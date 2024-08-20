@@ -38,7 +38,12 @@ class UserRegisterView(generics.CreateAPIView):
     def perform_create(self, serializer):
         serializer.save()
 
+from rest_framework.permissions import AllowAny
+
 class UserLoginView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
     @swagger_auto_schema(request_body=LoginSerializer)
     def post(self, request, *args, **kwargs):
         serializer = LoginSerializer(data=request.data)
