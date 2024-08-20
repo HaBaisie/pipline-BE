@@ -131,9 +131,35 @@ class UserSerializer(serializers.ModelSerializer):
         return representation
 
 
+from rest_framework import serializers
+from .models import Profile, CustomUser
+
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(required=True)
-    password = serializers.CharField(required=True, write_only=True)
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'password']
+
+    def validate(self, data):
+        user = authenticate(username=data['username'], password=data['password'])
+        if user and user.is_active:
+            return user
+        raise serializers.ValidationError("Invalid credentials")
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ['role', 'location', 'zone', 'state', 'area', 'unit']
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer()
+
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'email', 'profile']
+
 
 
 from rest_framework import serializers
