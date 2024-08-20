@@ -90,7 +90,8 @@ class PipelineRouteAndFaultViewSet(viewsets.ModelViewSet):
 
 
 class UserLogoutView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = []
+    permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
         django_logout(request)
