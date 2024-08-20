@@ -55,7 +55,14 @@ class UserLoginView(APIView):
             
             if user is not None:
                 django_login(request, user)
-                return Response({"message": "Login successful"}, status=status.HTTP_200_OK)
+
+                # Check if the user is authorized based on your criteria
+                is_authorized = True  # or whatever logic you want to apply here
+
+                return Response({
+                    "message": "Login successful",
+                    "isAuthorized": is_authorized
+                }, status=status.HTTP_200_OK)
             return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
