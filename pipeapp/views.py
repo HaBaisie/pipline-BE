@@ -39,7 +39,7 @@ class UserRegisterView(generics.CreateAPIView):
         serializer.save()
 
 from rest_framework.permissions import AllowAny
-
+from django.contrib.auth import get_user_model, authenticate, login as django_login
 class UserLoginView(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
