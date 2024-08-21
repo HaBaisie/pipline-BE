@@ -130,10 +130,9 @@ class UserSerializer(serializers.ModelSerializer):
 
         return representation
 
-
 from rest_framework import serializers
-from .models import Profile, CustomUser
 from django.contrib.auth import authenticate
+from .models import Profile, CustomUser
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
@@ -144,10 +143,16 @@ class LoginSerializer(serializers.Serializer):
         fields = ['username', 'password']
 
     def validate(self, data):
-        user = authenticate(username=data['username'], password=data['password'])
-        if user and user.is_active:
-            return user
-        raise serializers.ValidationError("Invalid credentials")
+        username = data.get('username')
+        password = data.get('password')
+
+        user = authenticate(username=username, password=password)
+        if not user or not user.is_active:
+            raise serializers.ValidationError("Invalid credentials")
+        
+        # Return the data and include the user object for further processing
+        data['user'] = user
+        return data
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -160,6 +165,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['username', 'email', 'profile']
+
 
 
 
