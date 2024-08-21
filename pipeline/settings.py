@@ -68,7 +68,7 @@ MIDDLEWARE = [
 ]
 
 # Allow all origins
-# CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Allow all headers
 CORS_ALLOW_HEADERS = ['*']
@@ -77,7 +77,7 @@ CORS_ALLOW_HEADERS = ['*']
 CORS_ALLOW_METHODS = ['*']
 
 # Allow credentials (cookies, HTTP authentication)
-# CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_CREDENTIALS = True
 
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'None'
@@ -86,13 +86,13 @@ SESSION_COOKIE_SAMESITE = 'None'
 # CSRF_TRUSTED_ORIGINS = ['https://pipline-be.onrender.com']
 
 
-CORS_ALLOWED_ORIGINS = [
+# CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # or the port your frontend is running on
 ]
-CSRF_TRUSTED_ORIGINS = ['http://localhost:5173']  # Add your frontend's origin
+# CSRF_TRUSTED_ORIGINS = ['http://localhost:5173']  # Add your frontend's origin
 
 # Optional settings
-CORS_ALLOW_CREDENTIALS = True
+# CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'pipeline.urls'
 
