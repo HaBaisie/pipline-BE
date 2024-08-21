@@ -133,6 +133,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 from rest_framework import serializers
 from .models import Profile, CustomUser
+from django.contrib.auth import authenticate
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
