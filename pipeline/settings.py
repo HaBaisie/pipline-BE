@@ -79,7 +79,7 @@ CORS_ALLOW_METHODS = ['*']
 # Allow credentials (cookies, HTTP authentication)
 CORS_ALLOW_CREDENTIALS = True
 
-SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = False
 SESSION_COOKIE_SAMESITE = 'None'
 # Add this to your settings.py
 
