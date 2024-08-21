@@ -81,6 +81,9 @@ CORS_ALLOW_CREDENTIALS = True
 
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'None'
+# Add this to your settings.py
+
+CSRF_TRUSTED_ORIGINS = ['https://pipline-be.onrender.com']
 
 
 ROOT_URLCONF = 'pipeline.urls'
