@@ -87,8 +87,8 @@ SESSION_COOKIE_SAMESITE = 'None'
 
 
 # CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # or the port your frontend is running on
-]
+#    "http://localhost:5173",  # or the port your frontend is running on
+#]
 # CSRF_TRUSTED_ORIGINS = ['http://localhost:5173']  # Add your frontend's origin
 
 # Optional settings
