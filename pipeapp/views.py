@@ -69,9 +69,7 @@ class UserLoginView(APIView):
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-from django.views.decorators.csrf import csrf_exempt
 
-@csrf_exempt
 class PipelineRouteAndFaultViewSet(viewsets.ModelViewSet):
     serializer_class = PipelineRouteAndFaultSerializer
     permission_classes = [permissions.IsAuthenticated]
