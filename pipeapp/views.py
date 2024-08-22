@@ -46,9 +46,6 @@ from rest_framework import status
 from .serializers import LoginSerializer, UserDetailSerializer
 from drf_yasg.utils import swagger_auto_schema
 
-from rest_framework.authtoken.models import Token
-from rest_framework.authentication import SessionAuthentication, TokenAuthentication
-
 class UserLoginView(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
@@ -57,31 +54,25 @@ class UserLoginView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
+            # Access the user object from the validated data
             user = serializer.validated_data['user']
 
             # Log the user in
             django_login(request, user)
-
-            # Get or create the token
-            token, created = Token.objects.get_or_create(user=user)
 
             # Serialize the user data including profile
             user_data = UserDetailSerializer(user).data
 
             return Response({
                 "message": "Login successful",
-                "token": token.key,
                 "user": user_data
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-from rest_framework.authentication import SessionAuthentication, TokenAuthentication
-
 class PipelineRouteAndFaultViewSet(viewsets.ModelViewSet):
     serializer_class = PipelineRouteAndFaultSerializer
-    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    authentication_classes = []
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -100,8 +91,7 @@ class PipelineRouteAndFaultViewSet(viewsets.ModelViewSet):
         elif profile.role == Profile.UNIT:
             return queryset.filter(state__area__unit=profile.unit)
         
-        return queryset.none()
-
+        return queryset.none()  # Fallback to no data if no role matches
 
 
 class UserLogoutView(APIView):
