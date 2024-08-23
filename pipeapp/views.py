@@ -46,6 +46,14 @@ from rest_framework import status
 from .serializers import LoginSerializer, UserDetailSerializer
 from drf_yasg.utils import swagger_auto_schema
 
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.views import APIView
+from django.contrib.auth import login as django_login
+from .serializers import LoginSerializer, UserDetailSerializer
+
 class UserLoginView(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
@@ -60,14 +68,19 @@ class UserLoginView(APIView):
             # Log the user in
             django_login(request, user)
 
+            # Generate or retrieve a token for the user
+            token, created = Token.objects.get_or_create(user=user)
+
             # Serialize the user data including profile
             user_data = UserDetailSerializer(user).data
 
             return Response({
                 "message": "Login successful",
-                "user": user_data
+                "token": token.key,  # Return the token
+                "user": user_data  # Return the user data
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class PipelineRouteAndFaultViewSet(viewsets.ModelViewSet):

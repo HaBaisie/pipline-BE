@@ -15,7 +15,6 @@ router.register(r'pipeline-routes-viewset', PipelineRouteAndFaultViewSet, basena
 urlpatterns = [
     path('register/', UserRegisterView.as_view(), name='register'),
     path('login/', UserLoginView.as_view(), name='login'),
-    path('logout/', UserLogoutView.as_view(), name='logout'),
-    path('api-token-auth/', obtain_auth_token, name='api_token_auth'),  # Add the token authentication endpoint
+    path('logout/', UserLogoutView.as_view(), name='logout'), 
     path('', include(router.urls)),  # Include the router's URLs
 ]
