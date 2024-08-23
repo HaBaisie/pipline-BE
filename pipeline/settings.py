@@ -88,11 +88,14 @@ SESSION_COOKIE_SAMESITE = 'None'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://pipeline-monitoring.netlify.app",  # or the port your frontend is running on
+    "https://pipeline-monitoring.netlify.app",
+    'https://pipline-be.onrender.com'  # or the port your frontend is running on
 ]
 CSRF_TRUSTED_ORIGINS = [
     'https://pipeline-monitoring.netlify.app',
-    'http://localhost:5173']  # Add your frontend's origin
+    'http://localhost:5173',
+    'https://pipline-be.onrender.com'
+    ]  # Add your frontend's origin
 
 # Optional settings
 # CORS_ALLOW_CREDENTIALS = True
