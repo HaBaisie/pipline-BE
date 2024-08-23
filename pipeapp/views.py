@@ -72,7 +72,7 @@ class UserLoginView(APIView):
 
 class PipelineRouteAndFaultViewSet(viewsets.ModelViewSet):
     serializer_class = PipelineRouteAndFaultSerializer
-    authentication_classes = [SessionAuthentication, BasicAuthentication]  # or your preferred authentication classes
+    authentication_classes = []
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):

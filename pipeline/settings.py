@@ -26,7 +26,6 @@ SECRET_KEY = 'django-insecure-qk=exu2$x%7^151fia99wj7iu^i!f@+m))&2k+_4$x-07a6hre
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -68,7 +67,7 @@ MIDDLEWARE = [
 ]
 
 # Allow all origins
-CORS_ALLOW_ALL_ORIGINS = True
+#CORS_ALLOW_ALL_ORIGINS = True
 
 # Allow all headers
 CORS_ALLOW_HEADERS = ['*']
@@ -84,13 +83,16 @@ SESSION_COOKIE_SAMESITE = 'None'
 # Add this to your settings.py
 
 # CSRF_TRUSTED_ORIGINS = ['https://pipline-be.onrender.com']
-CSRF_TRUSTED_ORIGINS = ['*']
+#CSRF_TRUSTED_ORIGINS = ['*']
 
 
-#CORS_ALLOWED_ORIGINS = [
-#    "http://localhost:5173",  # or the port your frontend is running on
-#]
-#CSRF_TRUSTED_ORIGINS = ['http://localhost:5173']  # Add your frontend's origin
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "https://pipeline-monitoring.netlify.app",  # or the port your frontend is running on
+]
+CSRF_TRUSTED_ORIGINS = [
+    'https://pipeline-monitoring.netlify.app',
+    'http://localhost:5173']  # Add your frontend's origin
 
 # Optional settings
 # CORS_ALLOW_CREDENTIALS = True
