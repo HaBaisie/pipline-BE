@@ -7,7 +7,7 @@ from drf_yasg.utils import swagger_auto_schema
 from django.contrib.auth import logout as django_logout
 from .serializers import UserSerializer, LoginSerializer, PipelineRouteAndFaultSerializer,UserDetailSerializer
 from .models import PipelineRoute, Profile
-
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 User = get_user_model()
 
 class IsHigherRole(permissions.BasePermission):
