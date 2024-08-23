@@ -68,7 +68,7 @@ MIDDLEWARE = [
 ]
 
 # Allow all origins
-# CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Allow all headers
 CORS_ALLOW_HEADERS = ['*']
@@ -84,12 +84,13 @@ SESSION_COOKIE_SAMESITE = 'None'
 # Add this to your settings.py
 
 # CSRF_TRUSTED_ORIGINS = ['https://pipline-be.onrender.com']
+CSRF_TRUSTED_ORIGINS = ['*']
 
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # or the port your frontend is running on
-]
-CSRF_TRUSTED_ORIGINS = ['http://localhost:5173']  # Add your frontend's origin
+#CORS_ALLOWED_ORIGINS = [
+#    "http://localhost:5173",  # or the port your frontend is running on
+#]
+#CSRF_TRUSTED_ORIGINS = ['http://localhost:5173']  # Add your frontend's origin
 
 # Optional settings
 # CORS_ALLOW_CREDENTIALS = True
