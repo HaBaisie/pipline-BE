@@ -72,8 +72,8 @@ class UserLoginView(APIView):
 
 class PipelineRouteAndFaultViewSet(viewsets.ModelViewSet):
     serializer_class = PipelineRouteAndFaultSerializer
-    authentication_classes = []
-    #permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
