@@ -49,26 +49,33 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.TokenAuthentication'
-        
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',  # Ensure schema generation for Swagger
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
 }
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',  # Ensure this is here
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.common.CommonMiddleware',  # Ensure this is here
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 # Allow all origins
 #CORS_ALLOW_ALL_ORIGINS = True
 
@@ -80,10 +87,15 @@ CORS_ALLOW_METHODS = ['*']
 
 # Allow credentials (cookies, HTTP authentication)
 CORS_ALLOW_CREDENTIALS = True
-
 SESSION_COOKIE_SECURE = False
 SESSION_COOKIE_SAMESITE = 'None'
-# Add this to your settings.py
+CSRF_TRUSTED_ORIGINS = [
+    'https://pipeline-monitoring.netlify.app',
+    'http://localhost:5173',
+    'https://pipline-be.onrender.com',
+    'http://127.0.0.1:8000'
+]
+
 
 # CSRF_TRUSTED_ORIGINS = ['https://pipline-be.onrender.com']
 #CSRF_TRUSTED_ORIGINS = ['*']
@@ -92,13 +104,11 @@ SESSION_COOKIE_SAMESITE = 'None'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "https://pipeline-monitoring.netlify.app",
-    'https://pipline-be.onrender.com'  # or the port your frontend is running on
+    "https://pipline-be.onrender.com",
+    "http://127.0.0.1:8000"
 ]
-CSRF_TRUSTED_ORIGINS = [
-    'https://pipeline-monitoring.netlify.app',
-    'http://localhost:5173',
-    'https://pipline-be.onrender.com'
-    ]  # Add your frontend's origin
+
+# Add your frontend's origin
 
 # Optional settings
 # CORS_ALLOW_CREDENTIALS = True
