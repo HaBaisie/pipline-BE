@@ -168,9 +168,8 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
 
 
-
 from rest_framework import serializers
-from .models import PipelineRoute, PipelineFault, State
+from .models import PipelineRoute, PipelineFault, State, Profile
 
 # Serializer for individual faults
 class PipelineFaultSerializer(serializers.ModelSerializer):
@@ -179,12 +178,12 @@ class PipelineFaultSerializer(serializers.ModelSerializer):
         fields = ['fault_coordinates', 'description', 'reported_at', 'status']
 
 class PipelineRouteAndFaultSerializer(serializers.ModelSerializer):
-    state = serializers.CharField()  # Accept state as a char field (name)
+    state = serializers.CharField()  # State is represented as a string
     id = serializers.ReadOnlyField()
     name = serializers.CharField()
     coordinates = serializers.JSONField()
     status = serializers.SerializerMethodField()
-    faults = PipelineFaultSerializer(many=True)
+    faults = PipelineFaultSerializer(many=True, required=False)  # Make faults optional
 
     class Meta:
         model = PipelineRoute
@@ -197,6 +196,16 @@ class PipelineRouteAndFaultSerializer(serializers.ModelSerializer):
         elif obj.faults.filter(status='warning').exists():
             return 'warning'
         return 'normal'
+
+    def create(self, validated_data):
+        faults_data = validated_data.pop('faults', [])
+        state_name = validated_data.pop('state')
+        # Retrieve or create the State object based on state_name
+        state, created = State.objects.get_or_create(name=state_name)
+        pipeline_route = PipelineRoute.objects.create(state=state, **validated_data)
+        for fault_data in faults_data:
+            PipelineFault.objects.create(pipeline_route=pipeline_route, **fault_data)
+        return pipeline_route
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -223,4 +232,3 @@ class PipelineRouteAndFaultSerializer(serializers.ModelSerializer):
                 if instance.state.area.unit != profile.unit:
                     return {}
         return representation
-
