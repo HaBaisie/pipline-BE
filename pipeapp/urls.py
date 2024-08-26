@@ -7,7 +7,8 @@ from .views import (
     PipelineRouteDetailView, 
     PipelineFaultListCreateView, 
     PipelineFaultDetailView, 
-    PipelineRouteAndFaultViewSet
+    PipelineRouteAndFaultViewSet,
+    UserLogoutView
 )
 
 # Create a router and register the viewset
@@ -22,4 +23,5 @@ urlpatterns = [
     # path('pipeline-faults/', PipelineFaultListCreateView.as_view(), name='pipeline-faults-list-create'),
     # path('pipeline-faults/<int:pk>/', PipelineFaultDetailView.as_view(), name='pipeline-faults-detail'),
     path('', include(router.urls)),  # Include the router's URLs
+    path('logout/', UserLogoutView.as_view(), name='logout'),
 ]

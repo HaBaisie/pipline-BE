@@ -102,6 +102,9 @@ class PipelineFault(models.Model):
 
     def __str__(self):
         return f"Fault in {self.pipeline_route.name} at {self.fault_coordinates}"
+    @property
+    def state(self):
+        return self.pipeline_route.state
 @receiver(post_save, sender=CustomUser)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:

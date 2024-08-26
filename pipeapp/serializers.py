@@ -2,6 +2,9 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from .models import Profile, Zone, State, Area, Unit, PipelineRoute, PipelineFault
+from rest_framework import serializers
+from django.contrib.auth import authenticate
+from .models import Profile, CustomUser
 
 CustomUser = get_user_model()
 
@@ -94,9 +97,32 @@ class UserSerializer(serializers.ModelSerializer):
 
         return user
 
+class UserDetailSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer()
+
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'email', 'profile']
+
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(required=True)
-    password = serializers.CharField(required=True, write_only=True)
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'password']
+
+    def validate(self, data):
+        username = data.get('username')
+        password = data.get('password')
+
+        user = authenticate(username=username, password=password)
+        if not user or not user.is_active:
+            raise serializers.ValidationError("Invalid credentials")
+        
+        # Return the data and include the user object for further processing
+        data['user'] = user
+        return data
 
 
 from rest_framework import serializers
