@@ -12,8 +12,8 @@ from .views import (
 )
 
 # Create a router and register the viewset
-router = DefaultRouter()
-router.register(r'pipeline-routes-viewset', PipelineRouteAndFaultViewSet, basename='pipeline-route-viewset')
+# router = DefaultRouter()
+# router.register(r'pipeline-routes-viewset', PipelineRouteAndFaultViewSet, basename='pipeline-route-viewset')
 
 urlpatterns = [
     path('register/', UserRegisterView.as_view(), name='register'),
