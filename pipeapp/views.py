@@ -9,9 +9,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
 from .models import CustomUser, PipelineRoute, Profile, PipelineFault
 from .serializers import UserSerializer, LoginSerializer, PipelineRouteAndFaultSerializer,UserDetailSerializer,  PipelineRouteSerializer, PipelineFaultSerializer
-
-
 User = get_user_model()
+
 
 # User registration view
 class UserRegisterView(generics.CreateAPIView):
@@ -53,17 +52,17 @@ class UserLoginView(APIView):
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# PipelineRoute views
+# Create PipelineRoute views
 class PipelineRouteListCreateView(generics.ListCreateAPIView):
     queryset = PipelineRoute.objects.all()
     serializer_class = PipelineRouteSerializer
 
+    @swagger_auto_schema(operation_description="List or create pipeline routes")
     def create(self, request, *args, **kwargs):
         if isinstance(request.data, list):
             serializer = self.get_serializer(data=request.data, many=True)
         else:
             serializer = self.get_serializer(data=request.data)
-
         if serializer.is_valid():
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
